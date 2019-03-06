@@ -47,7 +47,7 @@ public class WorldGen implements Listener{
 
         //Create the actual world.
         RegionalOres.INSTANCE.getLogger().info("Creating the RegionalOres world.");
-        oreRedistributionNoise = new SimplexOctaveGenerator(RegionalOres.INSTANCE.configIO.configData_OreSeed, 1);
+        oreRedistributionNoise = new SimplexOctaveGenerator(RegionalOres.INSTANCE.configIO.configData_GenSeed, 1);
         oreRedistributionNoise.setScale(1.0D);
 
         //Add the OrePopulator through onWorldInit event.

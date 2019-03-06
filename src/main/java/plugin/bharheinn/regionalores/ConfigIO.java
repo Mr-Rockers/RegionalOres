@@ -19,13 +19,13 @@ public class ConfigIO {
     private static final String CONFIG_GEN_SEED = "Generator.Seed";
     private static final String CONFIG_GEN_SCALE = "Generator.Scale";
 
-    public long configData_OreSeed;
     public HashMap<Material, Boolean> configTable_OresToRemove = new HashMap<>();
     public HashMap<Material, Integer> configTable_OresToReplace = new HashMap<>();
 
     public int configData_MapScale;
     public HashMap<Material, Byte> configTable_MapColors = new HashMap<>();
 
+    public long configData_GenSeed;
     public double configData_GenScale;
 
     private RegionalOres plugin;
@@ -34,7 +34,7 @@ public class ConfigIO {
         plugin = RegionalOres.INSTANCE; //For my sake.
 
         //Set defaults.
-        configData_OreSeed = new Random().nextLong();
+        configData_GenSeed = new Random().nextLong();
         configTable_OresToRemove.put(Material.COAL_ORE, true);
         configTable_OresToRemove.put(Material.IRON_ORE, true);
         configTable_OresToRemove.put(Material.GOLD_ORE, true);
@@ -81,7 +81,7 @@ public class ConfigIO {
                 plugin.getConfig().addDefault(CONFIG_MAP_COLORS + "." + p.getKey().name(), (int)p.getValue());
             }
 
-            plugin.getConfig().addDefault(CONFIG_GEN_SEED, configData_OreSeed);
+            plugin.getConfig().addDefault(CONFIG_GEN_SEED, configData_GenSeed);
             plugin.getConfig().addDefault(CONFIG_GEN_SCALE, configData_GenScale);
 
             plugin.getConfig().options().copyDefaults(true);
@@ -111,7 +111,7 @@ public class ConfigIO {
             }
         }
 
-        configData_OreSeed = plugin.getConfig().getLong(CONFIG_GEN_SEED);
+        configData_GenSeed = plugin.getConfig().getLong(CONFIG_GEN_SEED);
         configData_GenScale = plugin.getConfig().getDouble(CONFIG_GEN_SCALE);
     }
 
@@ -145,7 +145,7 @@ public class ConfigIO {
         }
 
         if(plugin.getConfig().get(CONFIG_GEN_SEED) == null || !(plugin.getConfig().get(CONFIG_GEN_SEED) instanceof Long)) {
-            plugin.getConfig().set(CONFIG_GEN_SEED, configData_OreSeed);
+            plugin.getConfig().set(CONFIG_GEN_SEED, configData_GenSeed);
             markForUpdate = true;
         }
         if(plugin.getConfig().get(CONFIG_GEN_SCALE) == null || !(plugin.getConfig().get(CONFIG_GEN_SCALE) instanceof Double)) {
