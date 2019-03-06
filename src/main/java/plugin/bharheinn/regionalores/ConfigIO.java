@@ -8,11 +8,25 @@ import java.util.Map;
 import java.util.Random;
 
 public class ConfigIO {
-
     public final File file;
-    public HashMap<Material, Boolean> configTable_ToRemove = new HashMap<>();
-    public HashMap<Material, Integer> configTable_ToReplace = new HashMap<>();
-    public long config_oreGenSeed;
+
+    private static final String CONFIG_ORE_REMOVE = "Ores.ToRemove";
+    private static final String CONFIG_ORE_REPLACE = "Ores.ToReplace";
+
+    private static final String CONFIG_MAP_SCALE = "Map.Scale";
+    private static final String CONFIG_MAP_COLORS = "Map.Colors";
+
+    private static final String CONFIG_GEN_SEED = "Generator.Seed";
+    private static final String CONFIG_GEN_SCALE = "Generator.Scale";
+
+    public long configData_OreSeed;
+    public HashMap<Material, Boolean> configTable_OresToRemove = new HashMap<>();
+    public HashMap<Material, Integer> configTable_OresToReplace = new HashMap<>();
+
+    public int configData_MapScale;
+    public HashMap<Material, Byte> configTable_MapColors = new HashMap<>();
+
+    public double configData_GenScale;
 
     private RegionalOres plugin;
 
@@ -20,38 +34,55 @@ public class ConfigIO {
         plugin = RegionalOres.INSTANCE; //For my sake.
 
         //Set defaults.
-        configTable_ToRemove.put(Material.COAL_ORE, true);
-        configTable_ToRemove.put(Material.IRON_ORE, true);
-        configTable_ToRemove.put(Material.GOLD_ORE, true);
-        configTable_ToRemove.put(Material.REDSTONE_ORE, true);
-        configTable_ToRemove.put(Material.LAPIS_ORE, true);
-        configTable_ToRemove.put(Material.DIAMOND_ORE, false);
-        configTable_ToRemove.put(Material.EMERALD_ORE, false);
+        configData_OreSeed = new Random().nextLong();
+        configTable_OresToRemove.put(Material.COAL_ORE, true);
+        configTable_OresToRemove.put(Material.IRON_ORE, true);
+        configTable_OresToRemove.put(Material.GOLD_ORE, true);
+        configTable_OresToRemove.put(Material.REDSTONE_ORE, true);
+        configTable_OresToRemove.put(Material.LAPIS_ORE, true);
+        configTable_OresToRemove.put(Material.DIAMOND_ORE, false);
+        configTable_OresToRemove.put(Material.EMERALD_ORE, false);
+        configTable_OresToReplace.put(Material.COAL_ORE, 35);
+        configTable_OresToReplace.put(Material.IRON_ORE, 30);
+        configTable_OresToReplace.put(Material.GOLD_ORE, 5);
+        configTable_OresToReplace.put(Material.REDSTONE_ORE, 10);
+        configTable_OresToReplace.put(Material.LAPIS_ORE, 3);
+        configTable_OresToReplace.put(Material.DIAMOND_ORE, 0);
+        configTable_OresToReplace.put(Material.EMERALD_ORE, 0);
+        configTable_OresToReplace.put(Material.NETHER_QUARTZ_ORE, 2);
 
-        configTable_ToReplace.put(Material.COAL_ORE, 5);
-        configTable_ToReplace.put(Material.IRON_ORE, 5);
-        configTable_ToReplace.put(Material.GOLD_ORE, 2);
-        configTable_ToReplace.put(Material.REDSTONE_ORE, 4);
-        configTable_ToReplace.put(Material.LAPIS_ORE, 2);
-        configTable_ToReplace.put(Material.DIAMOND_ORE, 0);
-        configTable_ToReplace.put(Material.EMERALD_ORE, 0);
-        configTable_ToReplace.put(Material.NETHER_QUARTZ_ORE, 0);
+        configData_MapScale = 7;
+        configTable_MapColors.put(Material.COAL_ORE, (byte)47);
+        configTable_MapColors.put(Material.IRON_ORE, (byte)57);
+        configTable_MapColors.put(Material.GOLD_ORE, (byte)122);
+        configTable_MapColors.put(Material.REDSTONE_ORE, (byte)114);
+        configTable_MapColors.put(Material.LAPIS_ORE, (byte)102);
+        configTable_MapColors.put(Material.DIAMOND_ORE, (byte)126);
+        configTable_MapColors.put(Material.EMERALD_ORE, (byte)134);
+        configTable_MapColors.put(Material.NETHER_QUARTZ_ORE, (byte)146);
 
-        config_oreGenSeed = new Random().nextLong();
+        configData_GenScale = 5000D;
 
+        //Begin loading / creative file.
         file = new File(plugin.getDataFolder() + File.separator + "config.yml");
 
         if (!file.exists()) {
 
-            plugin.getConfig().addDefault("Ores.Seed", config_oreGenSeed);
 
-            for (Map.Entry<Material, Boolean> p : configTable_ToRemove.entrySet()) {
-                plugin.getConfig().addDefault("Ores.ToRemove." + p.getKey().name(), p.getValue());
+            for (Map.Entry<Material, Boolean> p : configTable_OresToRemove.entrySet()) {
+                plugin.getConfig().addDefault(CONFIG_ORE_REMOVE + "." + p.getKey().name(), p.getValue());
+            }
+            for (Map.Entry<Material, Integer> p : configTable_OresToReplace.entrySet()) {
+                plugin.getConfig().addDefault(CONFIG_ORE_REPLACE + "." + p.getKey().name(), p.getValue());
             }
 
-            for (Map.Entry<Material, Integer> p : configTable_ToReplace.entrySet()) {
-                plugin.getConfig().addDefault("Ores.ToReplace." + p.getKey().name(), p.getValue());
+            plugin.getConfig().addDefault(CONFIG_MAP_SCALE, configData_MapScale);
+            for (Map.Entry<Material, Byte> p : configTable_MapColors.entrySet()) {
+                plugin.getConfig().addDefault(CONFIG_MAP_COLORS + "." + p.getKey().name(), (int)p.getValue());
             }
+
+            plugin.getConfig().addDefault(CONFIG_GEN_SEED, configData_OreSeed);
+            plugin.getConfig().addDefault(CONFIG_GEN_SCALE, configData_GenScale);
 
             plugin.getConfig().options().copyDefaults(true);
             plugin.saveConfig();
@@ -59,43 +90,67 @@ public class ConfigIO {
             fixConfig();
         }
 
-        config_oreGenSeed = plugin.getConfig().getLong("Ores.Seed");
-
-        configTable_ToRemove.clear();
-        for (String key : plugin.getConfig().getConfigurationSection("Ores.ToRemove").getKeys(false)) {
+        configTable_OresToRemove.clear();
+        for (String key : plugin.getConfig().getConfigurationSection(CONFIG_ORE_REMOVE).getKeys(false)) {
             if(Material.getMaterial(key) != null) {
-                configTable_ToRemove.put(Material.getMaterial(key), plugin.getConfig().getBoolean("Ores.ToRemove." + key));
+                configTable_OresToRemove.put(Material.getMaterial(key), plugin.getConfig().getBoolean(CONFIG_ORE_REMOVE + "." + key));
+            }
+        }
+        configTable_OresToReplace.clear();
+        for (String key : plugin.getConfig().getConfigurationSection(CONFIG_ORE_REPLACE).getKeys(false)) {
+            if(Material.getMaterial(key) != null) {
+                configTable_OresToReplace.put(Material.getMaterial(key), plugin.getConfig().getInt(CONFIG_ORE_REPLACE + "." + key));
             }
         }
 
-        configTable_ToReplace.clear();
-        for (String key : plugin.getConfig().getConfigurationSection("Ores.ToReplace").getKeys(false)) {
+        configData_MapScale = plugin.getConfig().getInt(CONFIG_MAP_SCALE);
+        configTable_MapColors.clear();
+        for (String key : plugin.getConfig().getConfigurationSection(CONFIG_MAP_COLORS).getKeys(false)) {
             if(Material.getMaterial(key) != null) {
-                configTable_ToReplace.put(Material.getMaterial(key), plugin.getConfig().getInt("Ores.ToReplace." + key));
+                configTable_MapColors.put(Material.getMaterial(key), (byte)plugin.getConfig().getInt(CONFIG_MAP_COLORS + "." + key));
             }
         }
+
+        configData_OreSeed = plugin.getConfig().getLong(CONFIG_GEN_SEED);
+        configData_GenScale = plugin.getConfig().getDouble(CONFIG_GEN_SCALE);
     }
 
     public void fixConfig() {
 
         boolean markForUpdate = false;
 
-        if(plugin.getConfig().get("Ores.Seed") == null || !(plugin.getConfig().get("Ores.Seed") instanceof Long)) {
-            plugin.getConfig().set("Ores.Seed", config_oreGenSeed);
-            markForUpdate = true;
+        for (Map.Entry<Material, Boolean> p : configTable_OresToRemove.entrySet()) {
+            if (plugin.getConfig().get(CONFIG_ORE_REMOVE + "." + p.getKey().name()) == null || !(plugin.getConfig().get(CONFIG_ORE_REMOVE + "." + p.getKey().name()) instanceof Boolean)) {
+                plugin.getConfig().set(CONFIG_ORE_REMOVE + "." + p.getKey().name(), p.getValue());
+                markForUpdate = true;
+            }
+        }
+        for (Map.Entry<Material, Integer> p : configTable_OresToReplace.entrySet()) {
+            if (plugin.getConfig().get(CONFIG_ORE_REPLACE + "." + p.getKey().name()) == null || !(plugin.getConfig().get(CONFIG_ORE_REPLACE + "." + p.getKey().name()) instanceof Integer)) {
+                plugin.getConfig().set(CONFIG_ORE_REPLACE + "." + p.getKey().name(), p.getValue());
+                markForUpdate = true;
+            }
         }
 
-        for (Map.Entry<Material, Boolean> p : configTable_ToRemove.entrySet()) {
-            if (plugin.getConfig().get("Ores.ToRemove." + p.getKey().name()) == null || !(plugin.getConfig().get("Ores.ToRemove." + p.getKey().name()) instanceof Boolean)) {
-                plugin.getConfig().set("Ores.ToRemove." + p.getKey().name(), p.getValue());
+        if(plugin.getConfig().get(CONFIG_MAP_SCALE) == null || !(plugin.getConfig().get(CONFIG_MAP_SCALE) instanceof Integer)) {
+            plugin.getConfig().set(CONFIG_MAP_SCALE, configData_MapScale);
+            markForUpdate = true;
+        }
+        for (Map.Entry<Material, Byte> p : configTable_MapColors.entrySet()) {
+            //Store byte as an integer...
+            if (plugin.getConfig().get(CONFIG_MAP_COLORS + "." + p.getKey().name()) == null || !(plugin.getConfig().get(CONFIG_MAP_COLORS + "." + p.getKey().name()) instanceof Integer)) {
+                plugin.getConfig().set(CONFIG_MAP_COLORS + "." + p.getKey().name(), (int) p.getValue());
                 markForUpdate = true;
             }
         }
-        for (Map.Entry<Material, Integer> p : configTable_ToReplace.entrySet()) {
-            if (plugin.getConfig().get("Ores.ToReplace." + p.getKey().name()) == null || !(plugin.getConfig().get("Ores.ToReplace." + p.getKey().name()) instanceof Boolean)) {
-                plugin.getConfig().set("Ores.ToReplace." + p.getKey().name(), p.getValue());
-                markForUpdate = true;
-            }
+
+        if(plugin.getConfig().get(CONFIG_GEN_SEED) == null || !(plugin.getConfig().get(CONFIG_GEN_SEED) instanceof Long)) {
+            plugin.getConfig().set(CONFIG_GEN_SEED, configData_OreSeed);
+            markForUpdate = true;
+        }
+        if(plugin.getConfig().get(CONFIG_GEN_SCALE) == null || !(plugin.getConfig().get(CONFIG_GEN_SCALE) instanceof Double)) {
+            plugin.getConfig().set(CONFIG_GEN_SCALE, configData_GenScale);
+            markForUpdate = true;
         }
 
         if (markForUpdate) {

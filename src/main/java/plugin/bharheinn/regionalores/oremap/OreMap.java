@@ -4,48 +4,52 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import plugin.bharheinn.regionalores.RegionalOres;
 
+import java.util.Collections;
+
 public class OreMap implements Listener {
 
-    private ItemStack mapStack;
-
-    public OreMap(Player player) {
+    public OreMap(Player player, boolean inOffhand) {
 
         MapView mv = RegionalOres.INSTANCE.getServer().createMap(RegionalOres.INSTANCE.worldGen.regionalOresWorld);
         mv.addRenderer(new OreMapRenderer());
 
-        mapStack = new ItemStack(Material.FILLED_MAP, 1);
+        ItemStack mapStack = new ItemStack(Material.FILLED_MAP, 1);
 
         MapMeta mm = (MapMeta) mapStack.getItemMeta();
         mm.setMapView(mv);
         mm.setDisplayName("Ore Map");
+        mm.setLore(Collections.singletonList("RegionalOres Plugin Addition"));
 
         mapStack.setItemMeta(mm);
 
-        player.getInventory().setItemInMainHand(mapStack);
+        if(inOffhand) {
+            player.getInventory().setItemInOffHand(mapStack);
+        }
+        else {
+            player.getInventory().setItemInMainHand(mapStack);
+        }
     }
 
-    public static boolean IsOreMap(ItemStack check) {
+    static boolean IsOreMap(ItemStack check) {
         if(!RegionalOres.IsStackEmpty(check) &&
                 check.getType() == Material.FILLED_MAP && //If is a filled map.
                 check.hasItemMeta() && //Contains metadata.
                 check.getItemMeta() instanceof MapMeta) { //Has map metadata.
 
-            //TODO Change this method. This is probably not the best way to check if the map is an OreMap...
-            for (MapRenderer renderer : ((MapMeta) check.getItemMeta()).getMapView().getRenderers()) { //Obtain all renderers.
-                if(renderer instanceof OreMapRenderer) { //If map renderer is an OreMapRenderer, return true.
-                    return true;
+            if(check.getItemMeta().hasLore()) {
+                for (String lore : check.getItemMeta().getLore()) { //Obtain lore strings.
+                    if (lore.equals("RegionalOres Plugin Addition")) {
+                        return true;
+                    }
                 }
             }
         }
@@ -84,9 +88,19 @@ public class OreMap implements Listener {
         }
 
         @EventHandler
+        public void onPlayerInteractEntityEvent (PlayerInteractEntityEvent event) {
+            if (IsOreMap(event.getPlayer().getInventory().getItemInMainHand())) {
+                event.setCancelled(true);
+            }
+        }
+
+        @EventHandler
         public void onPlayerChangeWorld (PlayerChangedWorldEvent event) {
             FindAndRemoveOreMaps(event.getPlayer());
         }
+
+        @EventHandler
+        public void onPlayerDied (PlayerDeathEvent event) { FindAndRemoveOreMaps(event.getEntity() );}
 
         @EventHandler
         public void onPlayerJoin (PlayerJoinEvent event) { FindAndRemoveOreMaps(event.getPlayer()); } //Just for compatibility.

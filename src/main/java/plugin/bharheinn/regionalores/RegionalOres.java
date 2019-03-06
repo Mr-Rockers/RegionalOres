@@ -1,5 +1,6 @@
 package plugin.bharheinn.regionalores;
 
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,11 +52,20 @@ public class RegionalOres extends JavaPlugin implements CommandExecutor {
         if (command.getName().equalsIgnoreCase("oremap")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                if (player.getWorld() == worldGen.regionalOresWorld) {
-                    OreMap.FindAndRemoveOreMaps(player);
-                    new OreMap(player);
-                } else {
-                    player.sendMessage(ChatColor.RED + "This command only works in the Regional Ores world.");
+                if(player.hasPermission("regionalores.oremap")) {
+                    if (player.getWorld() == worldGen.regionalOresWorld) {
+                        OreMap.FindAndRemoveOreMaps(player);
+                        if (IsStackEmpty(player.getInventory().getItemInOffHand())) {
+                            new OreMap(player, true);
+                        } else if (IsStackEmpty(player.getInventory().getItemInMainHand())) {
+                            new OreMap(player, false);
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "This command only works in the Regional Ores world.");
+                    }
+                }
+                else {
+                    player.sendMessage(ChatColor.RED + "Insufficient permissions.");
                 }
             }
         }
