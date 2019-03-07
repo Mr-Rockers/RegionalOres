@@ -15,6 +15,8 @@ public class ConfigIO {
 
     private static final String CONFIG_MAP_SCALE = "Map.Scale";
     private static final String CONFIG_MAP_COLORS = "Map.Colors";
+    private static final String CONFIG_MAP_LANG_CURRENTREGION = "Map.Language.CurrentRegion";
+    private static final String CONFIG_MAP_LANG_ORENAMES = "Map.Language.OreNames";
 
     private static final String CONFIG_GEN_SEED = "Generator.Seed";
     private static final String CONFIG_GEN_SCALE = "Generator.Scale";
@@ -24,6 +26,8 @@ public class ConfigIO {
 
     public int configData_MapScale;
     public HashMap<Material, Byte> configTable_MapColors = new HashMap<>();
+    public String configData_Map_LangCurrentRegion;
+    public HashMap<Material, String> configTable_Map_LangOreNames = new HashMap<>();
 
     public long configData_GenSeed;
     public double configData_GenScale;
@@ -34,7 +38,6 @@ public class ConfigIO {
         plugin = RegionalOres.INSTANCE; //For my sake.
 
         //Set defaults.
-        configData_GenSeed = new Random().nextLong();
         configTable_OresToRemove.put(Material.COAL_ORE, true);
         configTable_OresToRemove.put(Material.IRON_ORE, true);
         configTable_OresToRemove.put(Material.GOLD_ORE, true);
@@ -42,8 +45,8 @@ public class ConfigIO {
         configTable_OresToRemove.put(Material.LAPIS_ORE, true);
         configTable_OresToRemove.put(Material.DIAMOND_ORE, false);
         configTable_OresToRemove.put(Material.EMERALD_ORE, false);
-        configTable_OresToReplace.put(Material.COAL_ORE, 35);
-        configTable_OresToReplace.put(Material.IRON_ORE, 30);
+        configTable_OresToReplace.put(Material.COAL_ORE, 30);
+        configTable_OresToReplace.put(Material.IRON_ORE, 25);
         configTable_OresToReplace.put(Material.GOLD_ORE, 5);
         configTable_OresToReplace.put(Material.REDSTONE_ORE, 10);
         configTable_OresToReplace.put(Material.LAPIS_ORE, 3);
@@ -51,7 +54,7 @@ public class ConfigIO {
         configTable_OresToReplace.put(Material.EMERALD_ORE, 0);
         configTable_OresToReplace.put(Material.NETHER_QUARTZ_ORE, 2);
 
-        configData_MapScale = 7;
+        configData_MapScale = 20;
         configTable_MapColors.put(Material.COAL_ORE, (byte)47);
         configTable_MapColors.put(Material.IRON_ORE, (byte)57);
         configTable_MapColors.put(Material.GOLD_ORE, (byte)122);
@@ -61,13 +64,15 @@ public class ConfigIO {
         configTable_MapColors.put(Material.EMERALD_ORE, (byte)134);
         configTable_MapColors.put(Material.NETHER_QUARTZ_ORE, (byte)146);
 
-        configData_GenScale = 5000D;
+        configData_Map_LangCurrentRegion = "§33;Current Region: §34;";
 
-        //Begin loading / creative file.
+        configData_GenSeed = new Random().nextLong();
+        configData_GenScale = 3000D;
+
+        //Begin loading / create file.
         file = new File(plugin.getDataFolder() + File.separator + "config.yml");
 
         if (!file.exists()) {
-
 
             for (Map.Entry<Material, Boolean> p : configTable_OresToRemove.entrySet()) {
                 plugin.getConfig().addDefault(CONFIG_ORE_REMOVE + "." + p.getKey().name(), p.getValue());
@@ -80,6 +85,9 @@ public class ConfigIO {
             for (Map.Entry<Material, Byte> p : configTable_MapColors.entrySet()) {
                 plugin.getConfig().addDefault(CONFIG_MAP_COLORS + "." + p.getKey().name(), (int)p.getValue());
             }
+
+            plugin.getConfig().addDefault(CONFIG_MAP_LANG_CURRENTREGION, configData_Map_LangCurrentRegion);
+            //Do not add Config_Map_Lang_OreNames as default as it is optional.
 
             plugin.getConfig().addDefault(CONFIG_GEN_SEED, configData_GenSeed);
             plugin.getConfig().addDefault(CONFIG_GEN_SCALE, configData_GenScale);
@@ -100,6 +108,17 @@ public class ConfigIO {
         for (String key : plugin.getConfig().getConfigurationSection(CONFIG_ORE_REPLACE).getKeys(false)) {
             if(Material.getMaterial(key) != null) {
                 configTable_OresToReplace.put(Material.getMaterial(key), plugin.getConfig().getInt(CONFIG_ORE_REPLACE + "." + key));
+            }
+        }
+
+        configData_Map_LangCurrentRegion = plugin.getConfig().getString(CONFIG_MAP_LANG_CURRENTREGION);
+        configTable_Map_LangOreNames.clear();
+
+        if(plugin.getConfig().getConfigurationSection(CONFIG_MAP_LANG_ORENAMES) != null) { //Only has to be done to CONFIG_MAP_LANG_ORENAMES as it is optional.
+            for (String key : plugin.getConfig().getConfigurationSection(CONFIG_MAP_LANG_ORENAMES).getKeys(false)) {
+                if (Material.getMaterial(key) != null) {
+                    configTable_Map_LangOreNames.put(Material.getMaterial(key), plugin.getConfig().getString(CONFIG_MAP_LANG_ORENAMES + "." + key));
+                }
             }
         }
 
@@ -142,6 +161,11 @@ public class ConfigIO {
                 plugin.getConfig().set(CONFIG_MAP_COLORS + "." + p.getKey().name(), (int) p.getValue());
                 markForUpdate = true;
             }
+        }
+
+        if(plugin.getConfig().get(CONFIG_MAP_LANG_CURRENTREGION) == null || !(plugin.getConfig().get(CONFIG_MAP_LANG_CURRENTREGION) instanceof String)) {
+            plugin.getConfig().set(CONFIG_MAP_LANG_CURRENTREGION, configData_Map_LangCurrentRegion);
+            markForUpdate = true;
         }
 
         if(plugin.getConfig().get(CONFIG_GEN_SEED) == null || !(plugin.getConfig().get(CONFIG_GEN_SEED) instanceof Long)) {

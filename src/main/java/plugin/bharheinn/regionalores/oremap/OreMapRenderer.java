@@ -95,7 +95,7 @@ public class OreMapRenderer extends MapRenderer {
                     }
                 }
             }
-            canvas.drawText(2, 2, mcFont, "§33;Current Region: §34;\n" + RegionalOres.INSTANCE.worldGen.getSimpleOreName(currentPositionMaterial));
+            canvas.drawText(2, 2, mcFont, RegionalOres.INSTANCE.configIO.configData_Map_LangCurrentRegion + "\n" + RegionalOres.INSTANCE.worldGen.getSimpleOreName(currentPositionMaterial));
         }
     }
 }

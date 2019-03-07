@@ -74,7 +74,7 @@ public class WorldGen implements Listener{
 
             if(sortedOrePool.isEmpty()) {
                 sortedOrePool.add(unorderedOre);
-                simpleOreNames.put(unorderedOre, getSimpleString(unorderedOre));
+                simpleOreNames.put(unorderedOre, simplifyMaterialName(unorderedOre));
             }
             else {
                 for (int i = 0; i < sortedOrePool.size(); i++) {
@@ -99,7 +99,7 @@ public class WorldGen implements Listener{
                         }
                         //Character at this point is alphabetically lower(?) and now needs to be placed.
                             sortedOrePool.add(i, unorderedOre);
-                            simpleOreNames.put(unorderedOre, getSimpleString(unorderedOre));
+                            simpleOreNames.put(unorderedOre, simplifyMaterialName(unorderedOre));
                             finished = true;
                             break;
                     }
@@ -107,7 +107,7 @@ public class WorldGen implements Listener{
                         break;
                     } else if (i == sortedOrePool.size() - 1) { //We are at the last element.
                         sortedOrePool.add(unorderedOre);
-                        simpleOreNames.put(unorderedOre, getSimpleString(unorderedOre));
+                        simpleOreNames.put(unorderedOre, simplifyMaterialName(unorderedOre));
                     }
                 }
             }
@@ -172,14 +172,24 @@ public class WorldGen implements Listener{
 
     public String getSimpleOreName(Material oreMaterial) {
         if(!simpleOreNames.isEmpty()) {
-            if(simpleOreNames.get(oreMaterial) != null) {
-                return simpleOreNames.get(oreMaterial);
+            String simpleMaterialName = simpleOreNames.get(oreMaterial);
+            if(simpleMaterialName != null) {
+                return simpleMaterialName;
             }
         }
         return oreMaterial.name();
     }
 
-    private String getSimpleString(Material material) {
+    private String simplifyMaterialName(Material material) {
+        //First, check configTable_Map_LangOreNames just to make sure that there hasn't been a custom value set by the server owner.
+        if(!RegionalOres.INSTANCE.configIO.configTable_Map_LangOreNames.isEmpty()) {
+            String customMaterialName = RegionalOres.INSTANCE.configIO.configTable_Map_LangOreNames.get(material);
+            if(customMaterialName != null) {
+                return customMaterialName;
+            }
+        }
+
+        //Otherwise, "fix" the default material names to something a bit more pleasant.
         String rawName = material.name().toLowerCase();
         String simpleName = "";
 
