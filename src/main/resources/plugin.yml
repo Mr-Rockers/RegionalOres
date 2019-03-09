@@ -5,9 +5,6 @@ api-version: 1.13
 authors: [Bharheinn]
 description: A plugin that encourages players to travel long distances, trade, and utilise economies to obtain resources.
 commands:
-  ping:
-    description: Used to establish if the plugin is working correctly.
-    usage: /<command>
   regionaloresworld:
     description: Takes the player to the Regional Ores world.
     usage: /<command>

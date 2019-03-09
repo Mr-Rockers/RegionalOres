@@ -66,9 +66,9 @@ public class WorldGen implements Listener{
     // Used to create a loose of standardization for the generator (that isn't otherwise hardcoded).
     // Essentially an insertion sort algorithm that takes certain properties of the Materials into accounts.
     private void createOrePool() {
-        Set<Material> unorderedOrePool = RegionalOres.INSTANCE.configIO.configTable_OresToReplace.keySet();
+        Set<Material> unorderedOrePool = RegionalOres.INSTANCE.configIO.configTable_Gen_OresToReplace.keySet();
         for(Material unorderedOre : unorderedOrePool) {
-            if(RegionalOres.INSTANCE.configIO.configTable_OresToReplace.get(unorderedOre) == 0) {
+            if(RegionalOres.INSTANCE.configIO.configTable_Gen_OresToReplace.get(unorderedOre) == 0) {
                 continue; //We don't want to add disabled ores to the pool.
             }
 
@@ -118,7 +118,7 @@ public class WorldGen implements Listener{
     private void establishOrePrecedenceBounds() {
         int[] rawPrecedence = new int[sortedOrePool.size()];
         for(int i = 0; i < rawPrecedence.length; i++) {
-            rawPrecedence[i] = RegionalOres.INSTANCE.configIO.configTable_OresToReplace.get(sortedOrePool.get(i));
+            rawPrecedence[i] = RegionalOres.INSTANCE.configIO.configTable_Gen_OresToReplace.get(sortedOrePool.get(i));
         }
         int totalPrecedence = 0;
         for (int i = 0; i < rawPrecedence.length; i++) {

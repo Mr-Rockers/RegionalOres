@@ -18,12 +18,12 @@ public class OreMapRenderer extends MapRenderer {
         cursorCollection.addCursor(playerCursor);
         mcFont = new MinecraftFont();
 
-        mapScale = RegionalOres.INSTANCE.configIO.configData_MapScale;
+        mapScale = RegionalOres.INSTANCE.configIO.configData_Map_Scale;
     }
 
     private byte getOreColour (MapCanvas canvas, int x, int z, Material oreMaterial) {
-        if (RegionalOres.INSTANCE.configIO.configTable_MapColors.get(oreMaterial) != null) {
-            return RegionalOres.INSTANCE.configIO.configTable_MapColors.get(oreMaterial);
+        if (RegionalOres.INSTANCE.configIO.configTable_Map_ColorOres.get(oreMaterial) != null) {
+            return RegionalOres.INSTANCE.configIO.configTable_Map_ColorOres.get(oreMaterial);
         } else {
             return (byte)66; //Horrendous Error Pink
         }
@@ -65,7 +65,7 @@ public class OreMapRenderer extends MapRenderer {
                             canvas.setPixel(x, z, currentOreColour);
 
                             //Effectively, apply an "outline" filter.
-                            byte outlineColour = (byte) 34;
+                            byte outlineColour = RegionalOres.INSTANCE.configIO.configData_Map_ColorOutline;
                             boolean surroundingPixelDifferent = false;
                             if (x > 0) { //Do not factor in left edge.
                                 byte previousPixel = canvas.getPixel(x - 1, z);
@@ -90,7 +90,7 @@ public class OreMapRenderer extends MapRenderer {
                             }
                         } else {
                             //Draw the background to the "current region" section.
-                            canvas.setPixel(x, z, (byte) 91); //TODO Make the colour configurable in the config.yml
+                            canvas.setPixel(x, z, RegionalOres.INSTANCE.configIO.configData_Map_ColorInfoBox); //TODO Make the colour configurable in the config.yml
                         }
                     }
                 }

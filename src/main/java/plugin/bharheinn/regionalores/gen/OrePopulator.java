@@ -20,7 +20,7 @@ public class OrePopulator extends BlockPopulator {
                 for (int y = 0; y < world.getMaxHeight(); y++) {
                     Block block = chunk.getBlock(x, y, z);
                     Material blockMaterial = block.getType();
-                    for(Map.Entry<Material, Boolean> p : RegionalOres.INSTANCE.configIO.configTable_OresToRemove.entrySet()) {
+                    for(Map.Entry<Material, Boolean> p : RegionalOres.INSTANCE.configIO.configTable_Gen_OresToRemove.entrySet()) {
                         if(p.getKey() == blockMaterial) {
                             if(p.getValue()) {
                                 block.setType(RegionalOres.INSTANCE.worldGen.getOreMaterialType(chunk.getX() * 16 + x, chunk.getZ() * 16 + z), false);

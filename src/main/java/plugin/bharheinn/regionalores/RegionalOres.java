@@ -1,6 +1,5 @@
 package plugin.bharheinn.regionalores;
 
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;

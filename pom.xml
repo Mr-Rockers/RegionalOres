@@ -6,14 +6,12 @@
 
     <groupId>plugin.bharheinn</groupId>
     <artifactId>regionalores</artifactId>
-    <version>1 INDEV</version>
+    <version>2 INDEV</version>
     <packaging>jar</packaging>
 
     <name>RegionalOres</name>
 
-    <description>A plugin that forces players to travel long distances, trade, and utilise economies to obtain
-        resources.
-    </description>
+    <description>A plugin that encourages players to travel, trade, and utilise economies to obtain resources!</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
