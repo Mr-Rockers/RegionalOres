@@ -19,6 +19,8 @@ public class RegionalOres extends JavaPlugin implements CommandExecutor {
     public WorldGen worldGen;
     public ConfigIO configIO;
 
+    public static String PLUGIN_NAME, PLUGIN_VERSION;
+
     public RegionalOres() {
         INSTANCE = this;
         worldGen = new WorldGen();
@@ -26,6 +28,9 @@ public class RegionalOres extends JavaPlugin implements CommandExecutor {
 
     @Override
     public void onEnable() {
+        PLUGIN_NAME = getDescription().getName();
+        PLUGIN_VERSION = getDescription().getVersion();
+
         configIO = new ConfigIO();
         worldGen.createRegionalOresWorld();
 

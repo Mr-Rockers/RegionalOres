@@ -2,18 +2,26 @@ package plugin.bharheinn.regionalores;
 
 import org.bukkit.Material;
 
+import javax.swing.plaf.synth.Region;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 public class ConfigIO {
     public final File file;
+    private RegionalOres plugin;
 
     /*UTILITY VARIABLES*/
     private static final String CONFIG_UTIL_GENWORLD = "Util.GenerateRegionalOresWorld"; //Generate the regional ore world or replace ores in default world?
+        public boolean configData_UtilGenWorld;
     private static final String CONFIG_UTIL_SPAWNGENWORLD = "Util.SpawnInRegionalOresWorld"; //Spawn the player in the regional ore world if it is generated?
+        public boolean configData_UtilSpawnGenWorld;
     private static final String CONFIG_UTIL_PERMISSIONS = "Util.UsePermissions"; //Utilise permissions?
+        public boolean configData_UtilPermissions;
 
     /*GENERATION VARIABLES*/
     private static final String CONFIG_GEN_SEED = "Gen.Seed";
@@ -39,12 +47,16 @@ public class ConfigIO {
     private static final String CONFIG_MAP_LANG_ORENAMES = "Map.Language.OreNames";
         public HashMap<Material, String> configTable_Map_LangOreNames = new HashMap<>();
 
-    private RegionalOres plugin;
-
     public ConfigIO() {
         plugin = RegionalOres.INSTANCE; //For my sake.
 
         //Set defaults.
+        /*UTILITY*/
+        configData_UtilGenWorld = true;
+        configData_UtilSpawnGenWorld = false;
+        configData_UtilPermissions = true;
+
+        /*GENERATION*/
         configData_GenSeed = new Random().nextLong();
         configData_GenScale = 3000D;
         configTable_Gen_OresToRemove.put(Material.COAL_ORE, true);
@@ -63,6 +75,7 @@ public class ConfigIO {
         configTable_Gen_OresToReplace.put(Material.EMERALD_ORE, 0);
         configTable_Gen_OresToReplace.put(Material.NETHER_QUARTZ_ORE, 2);
 
+        /*OREMAP*/
         configData_Map_Scale = 20;
         configData_Map_ColorInfoBox = (byte)91;
         configData_Map_ColorOutline = (byte)34;
@@ -80,6 +93,24 @@ public class ConfigIO {
         file = new File(plugin.getDataFolder() + File.separator + "config.yml");
 
         if (!file.exists()) {
+
+            try {
+                file.createNewFile();
+                BufferedWriter commentWriter = new BufferedWriter(new FileWriter(file));
+                commentWriter.write("# " + RegionalOres.PLUGIN_NAME + " v" + RegionalOres.PLUGIN_VERSION);
+                commentWriter.newLine();
+                commentWriter.write("# Please visit https://github.com/Mr-Rockers/RegionalOres/wiki/Configuration for more info.");
+                commentWriter.newLine();
+                commentWriter.newLine();
+                commentWriter.close();
+            } catch(IOException exception) {
+                System.out.println("Unable to write comments to " + file.getPath() + ". Is there something wrong?");
+            }
+
+            /*UTILITY*/
+            plugin.getConfig().addDefault(CONFIG_UTIL_GENWORLD, configData_UtilGenWorld);
+            plugin.getConfig().addDefault(CONFIG_UTIL_SPAWNGENWORLD, configData_UtilSpawnGenWorld);
+            plugin.getConfig().addDefault(CONFIG_UTIL_PERMISSIONS, configData_UtilPermissions);
 
             /*GENERATION*/
             plugin.getConfig().addDefault(CONFIG_GEN_SEED, configData_GenSeed);
@@ -106,6 +137,11 @@ public class ConfigIO {
         } else {
             fixConfig();
         }
+
+        /*UTILITY*/
+        configData_UtilGenWorld = plugin.getConfig().getBoolean(CONFIG_UTIL_GENWORLD);
+        configData_UtilSpawnGenWorld = plugin.getConfig().getBoolean(CONFIG_UTIL_SPAWNGENWORLD);
+        configData_UtilPermissions = plugin.getConfig().getBoolean(CONFIG_UTIL_PERMISSIONS);
 
         /*GENERATION*/
         configData_GenSeed = plugin.getConfig().getLong(CONFIG_GEN_SEED);
@@ -154,6 +190,20 @@ public class ConfigIO {
     public void fixConfig() {
 
         boolean markForUpdate = false;
+
+        /*UTILITY*/
+        if(plugin.getConfig().get(CONFIG_UTIL_GENWORLD) == null || !(plugin.getConfig().get(CONFIG_UTIL_GENWORLD) instanceof Boolean)) {
+            plugin.getConfig().set(CONFIG_UTIL_GENWORLD, configData_UtilGenWorld);
+            markForUpdate = true;
+        }
+        if(plugin.getConfig().get(CONFIG_UTIL_SPAWNGENWORLD) == null || !(plugin.getConfig().get(CONFIG_UTIL_SPAWNGENWORLD) instanceof Boolean)) {
+            plugin.getConfig().set(CONFIG_UTIL_SPAWNGENWORLD, configData_UtilSpawnGenWorld);
+            markForUpdate = true;
+        }
+        if(plugin.getConfig().get(CONFIG_UTIL_PERMISSIONS) == null || !(plugin.getConfig().get(CONFIG_UTIL_PERMISSIONS) instanceof Boolean)) {
+            plugin.getConfig().set(CONFIG_UTIL_PERMISSIONS, configData_UtilPermissions);
+            markForUpdate = true;
+        }
 
         /*GENERATION*/
         if(plugin.getConfig().get(CONFIG_GEN_SEED) == null || !(plugin.getConfig().get(CONFIG_GEN_SEED) instanceof Long)) {
