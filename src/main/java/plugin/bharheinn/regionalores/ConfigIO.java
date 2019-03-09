@@ -62,7 +62,7 @@ public class ConfigIO {
         configTable_Gen_OresToReplace.put(Material.DIAMOND_ORE, 0);
         configTable_Gen_OresToReplace.put(Material.EMERALD_ORE, 0);
         configTable_Gen_OresToReplace.put(Material.NETHER_QUARTZ_ORE, 2);
-        
+
         configData_Map_Scale = 20;
         configData_Map_ColorInfoBox = (byte)91;
         configData_Map_ColorOutline = (byte)34;
