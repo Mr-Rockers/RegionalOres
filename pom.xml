@@ -6,7 +6,7 @@
 
     <groupId>plugin.bharheinn</groupId>
     <artifactId>regionalores</artifactId>
-    <version>1_r2 INDEV</version>
+    <version>1_r2</version>
     <packaging>jar</packaging>
 
     <name>RegionalOres</name>

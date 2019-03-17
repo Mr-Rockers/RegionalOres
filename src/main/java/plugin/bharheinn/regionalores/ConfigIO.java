@@ -2,7 +2,6 @@ package plugin.bharheinn.regionalores;
 
 import org.bukkit.Material;
 
-import javax.swing.plaf.synth.Region;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -16,11 +15,11 @@ public class ConfigIO {
     private RegionalOres plugin;
 
     /*UTILITY VARIABLES*/
-    private static final String CONFIG_UTIL_GENWORLD = "Util.GenerateRegionalOresWorld"; //Generate the regional ore world or replace ores in default world?
-        public boolean configData_UtilGenWorld;
-    private static final String CONFIG_UTIL_SPAWNGENWORLD = "Util.SpawnInRegionalOresWorld"; //Spawn the player in the regional ore world if it is generated?
-        public boolean configData_UtilSpawnGenWorld;
-    private static final String CONFIG_UTIL_PERMISSIONS = "Util.UsePermissions"; //Utilise permissions?
+    private static final String CONFIG_UTIL_STARTUP = "Util.ShutdownOnStartup";
+        public boolean configData_UtilStartup;
+    private static final String CONFIG_UTIL_GENWORLD = "Util.GenerateRegionalOresWorld";
+        public String configData_UtilGenWorld;
+    private static final String CONFIG_UTIL_PERMISSIONS = "Util.UsePermissions";
         public boolean configData_UtilPermissions;
 
     /*GENERATION VARIABLES*/
@@ -37,11 +36,11 @@ public class ConfigIO {
     private static final String CONFIG_MAP_SCALE = "Map.Scale";
         public int configData_Map_Scale;
     private static final String CONFIG_MAP_COLOR_INFOBOX = "Map.Color.Infobox";
-        public byte configData_Map_ColorInfoBox;
+        public int configData_Map_ColorInfoBox;
     private static final String CONFIG_MAP_COLOR_OUTLINE = "Map.Color.Outline";
-        public byte configData_Map_ColorOutline;
+        public int configData_Map_ColorOutline;
     private static final String CONFIG_MAP_COLOR_ORES = "Map.Color.Ores";
-        public HashMap<Material, Byte> configTable_Map_ColorOres = new HashMap<>();
+        public HashMap<Material, Integer> configTable_Map_ColorOres = new HashMap<>();
     private static final String CONFIG_MAP_LANG_CURRENTREGION = "Map.Language.CurrentRegion";
         public String configData_Map_LangCurrentRegion;
     private static final String CONFIG_MAP_LANG_ORENAMES = "Map.Language.OreNames";
@@ -52,8 +51,8 @@ public class ConfigIO {
 
         //Set defaults.
         /*UTILITY*/
-        configData_UtilGenWorld = true;
-        configData_UtilSpawnGenWorld = false;
+        configData_UtilStartup = true;
+        configData_UtilGenWorld = "world";
         configData_UtilPermissions = true;
 
         /*GENERATION*/
@@ -77,16 +76,16 @@ public class ConfigIO {
 
         /*OREMAP*/
         configData_Map_Scale = 20;
-        configData_Map_ColorInfoBox = (byte)91;
-        configData_Map_ColorOutline = (byte)34;
-        configTable_Map_ColorOres.put(Material.COAL_ORE, (byte)47);
-        configTable_Map_ColorOres.put(Material.IRON_ORE, (byte)57);
-        configTable_Map_ColorOres.put(Material.GOLD_ORE, (byte)122);
-        configTable_Map_ColorOres.put(Material.REDSTONE_ORE, (byte)114);
-        configTable_Map_ColorOres.put(Material.LAPIS_ORE, (byte)102);
-        configTable_Map_ColorOres.put(Material.DIAMOND_ORE, (byte)126);
-        configTable_Map_ColorOres.put(Material.EMERALD_ORE, (byte)134);
-        configTable_Map_ColorOres.put(Material.NETHER_QUARTZ_ORE, (byte)146);
+        configData_Map_ColorInfoBox = 91;
+        configData_Map_ColorOutline = 34;
+        configTable_Map_ColorOres.put(Material.COAL_ORE, 47);
+        configTable_Map_ColorOres.put(Material.IRON_ORE, 57);
+        configTable_Map_ColorOres.put(Material.GOLD_ORE, 122);
+        configTable_Map_ColorOres.put(Material.REDSTONE_ORE, 114);
+        configTable_Map_ColorOres.put(Material.LAPIS_ORE, 102);
+        configTable_Map_ColorOres.put(Material.DIAMOND_ORE, 126);
+        configTable_Map_ColorOres.put(Material.EMERALD_ORE, 134);
+        configTable_Map_ColorOres.put(Material.NETHER_QUARTZ_ORE, 146);
         configData_Map_LangCurrentRegion = "§33;Current Region: §34;";
 
         //Begin loading / create file.
@@ -101,15 +100,14 @@ public class ConfigIO {
                 commentWriter.newLine();
                 commentWriter.write("# Please visit https://github.com/Mr-Rockers/RegionalOres/wiki/Configuration for more info.");
                 commentWriter.newLine();
-                commentWriter.newLine();
                 commentWriter.close();
             } catch(IOException exception) {
                 System.out.println("Unable to write comments to " + file.getPath() + ". Is there something wrong?");
             }
 
             /*UTILITY*/
+            plugin.getConfig().addDefault(CONFIG_UTIL_STARTUP, configData_UtilStartup);
             plugin.getConfig().addDefault(CONFIG_UTIL_GENWORLD, configData_UtilGenWorld);
-            plugin.getConfig().addDefault(CONFIG_UTIL_SPAWNGENWORLD, configData_UtilSpawnGenWorld);
             plugin.getConfig().addDefault(CONFIG_UTIL_PERMISSIONS, configData_UtilPermissions);
 
             /*GENERATION*/
@@ -124,10 +122,10 @@ public class ConfigIO {
 
             /*OREMAP*/
             plugin.getConfig().addDefault(CONFIG_MAP_SCALE, configData_Map_Scale);
-            plugin.getConfig().addDefault(CONFIG_MAP_COLOR_INFOBOX, (int)configData_Map_ColorInfoBox);
-            plugin.getConfig().addDefault(CONFIG_MAP_COLOR_OUTLINE, (int)configData_Map_ColorOutline);
-            for (Map.Entry<Material, Byte> p : configTable_Map_ColorOres.entrySet()) {
-                plugin.getConfig().addDefault(CONFIG_MAP_COLOR_ORES + "." + p.getKey().name(), (int)p.getValue());
+            plugin.getConfig().addDefault(CONFIG_MAP_COLOR_INFOBOX, configData_Map_ColorInfoBox);
+            plugin.getConfig().addDefault(CONFIG_MAP_COLOR_OUTLINE, configData_Map_ColorOutline);
+            for (Map.Entry<Material, Integer> p : configTable_Map_ColorOres.entrySet()) {
+                plugin.getConfig().addDefault(CONFIG_MAP_COLOR_ORES + "." + p.getKey().name(), p.getValue());
             }
             plugin.getConfig().addDefault(CONFIG_MAP_LANG_CURRENTREGION, configData_Map_LangCurrentRegion);
             /////////Do not add Config_Map_Lang_OreNames as default as it is optional.
@@ -139,8 +137,8 @@ public class ConfigIO {
         }
 
         /*UTILITY*/
-        configData_UtilGenWorld = plugin.getConfig().getBoolean(CONFIG_UTIL_GENWORLD);
-        configData_UtilSpawnGenWorld = plugin.getConfig().getBoolean(CONFIG_UTIL_SPAWNGENWORLD);
+        configData_UtilStartup = plugin.getConfig().getBoolean(CONFIG_UTIL_STARTUP);
+        configData_UtilGenWorld = plugin.getConfig().getString(CONFIG_UTIL_GENWORLD);
         configData_UtilPermissions = plugin.getConfig().getBoolean(CONFIG_UTIL_PERMISSIONS);
 
         /*GENERATION*/
@@ -168,12 +166,12 @@ public class ConfigIO {
 
         /*OREMAP*/
         configData_Map_Scale = plugin.getConfig().getInt(CONFIG_MAP_SCALE);
-        configData_Map_ColorInfoBox = (byte)plugin.getConfig().getInt(CONFIG_MAP_COLOR_INFOBOX);
-        configData_Map_ColorOutline = (byte)plugin.getConfig().getInt(CONFIG_MAP_COLOR_OUTLINE);
+        configData_Map_ColorInfoBox = plugin.getConfig().getInt(CONFIG_MAP_COLOR_INFOBOX);
+        configData_Map_ColorOutline = plugin.getConfig().getInt(CONFIG_MAP_COLOR_OUTLINE);
         configTable_Map_ColorOres.clear();
         for (String key : plugin.getConfig().getConfigurationSection(CONFIG_MAP_COLOR_ORES).getKeys(false)) {
             if(Material.getMaterial(key) != null) {
-                configTable_Map_ColorOres.put(Material.getMaterial(key), (byte)plugin.getConfig().getInt(CONFIG_MAP_COLOR_ORES + "." + key));
+                configTable_Map_ColorOres.put(Material.getMaterial(key), plugin.getConfig().getInt(CONFIG_MAP_COLOR_ORES + "." + key));
             }
         }
         configData_Map_LangCurrentRegion = plugin.getConfig().getString(CONFIG_MAP_LANG_CURRENTREGION);
@@ -192,12 +190,12 @@ public class ConfigIO {
         boolean markForUpdate = false;
 
         /*UTILITY*/
-        if(plugin.getConfig().get(CONFIG_UTIL_GENWORLD) == null || !(plugin.getConfig().get(CONFIG_UTIL_GENWORLD) instanceof Boolean)) {
-            plugin.getConfig().set(CONFIG_UTIL_GENWORLD, configData_UtilGenWorld);
+        if(plugin.getConfig().get(CONFIG_UTIL_STARTUP) == null || !(plugin.getConfig().get(CONFIG_UTIL_STARTUP) instanceof Boolean)) {
+            plugin.getConfig().set(CONFIG_UTIL_STARTUP, configData_UtilStartup);
             markForUpdate = true;
         }
-        if(plugin.getConfig().get(CONFIG_UTIL_SPAWNGENWORLD) == null || !(plugin.getConfig().get(CONFIG_UTIL_SPAWNGENWORLD) instanceof Boolean)) {
-            plugin.getConfig().set(CONFIG_UTIL_SPAWNGENWORLD, configData_UtilSpawnGenWorld);
+        if(plugin.getConfig().get(CONFIG_UTIL_GENWORLD) == null || !(plugin.getConfig().get(CONFIG_UTIL_GENWORLD) instanceof String)) {
+            plugin.getConfig().set(CONFIG_UTIL_GENWORLD, configData_UtilGenWorld);
             markForUpdate = true;
         }
         if(plugin.getConfig().get(CONFIG_UTIL_PERMISSIONS) == null || !(plugin.getConfig().get(CONFIG_UTIL_PERMISSIONS) instanceof Boolean)) {
@@ -233,17 +231,17 @@ public class ConfigIO {
             markForUpdate = true;
         }
         if(plugin.getConfig().get(CONFIG_MAP_COLOR_INFOBOX) == null || !(plugin.getConfig().get(CONFIG_MAP_COLOR_INFOBOX) instanceof Integer)) {
-            plugin.getConfig().set(CONFIG_MAP_COLOR_INFOBOX, (int)configData_Map_ColorInfoBox);
+            plugin.getConfig().set(CONFIG_MAP_COLOR_INFOBOX, configData_Map_ColorInfoBox);
             markForUpdate = true;
         }
         if(plugin.getConfig().get(CONFIG_MAP_COLOR_OUTLINE) == null || !(plugin.getConfig().get(CONFIG_MAP_COLOR_OUTLINE) instanceof Integer)) {
-            plugin.getConfig().set(CONFIG_MAP_COLOR_OUTLINE, (int)configData_Map_ColorOutline);
+            plugin.getConfig().set(CONFIG_MAP_COLOR_OUTLINE, configData_Map_ColorOutline);
             markForUpdate = true;
         }
-        for (Map.Entry<Material, Byte> p : configTable_Map_ColorOres.entrySet()) {
+        for (Map.Entry<Material, Integer> p : configTable_Map_ColorOres.entrySet()) {
             //Store byte as an integer...
             if (plugin.getConfig().get(CONFIG_MAP_COLOR_ORES + "." + p.getKey().name()) == null || !(plugin.getConfig().get(CONFIG_MAP_COLOR_ORES + "." + p.getKey().name()) instanceof Integer)) {
-                plugin.getConfig().set(CONFIG_MAP_COLOR_ORES + "." + p.getKey().name(), (int) p.getValue());
+                plugin.getConfig().set(CONFIG_MAP_COLOR_ORES + "." + p.getKey().name(), p.getValue());
                 markForUpdate = true;
             }
         }

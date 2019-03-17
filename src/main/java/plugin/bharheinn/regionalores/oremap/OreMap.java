@@ -19,7 +19,7 @@ public class OreMap implements Listener {
 
     public OreMap(Player player, boolean inOffhand) {
 
-        MapView mv = RegionalOres.INSTANCE.getServer().createMap(RegionalOres.INSTANCE.worldGen.regionalOresWorld);
+        MapView mv = RegionalOres.INSTANCE.getServer().createMap(RegionalOres.INSTANCE.getServer().getWorld(RegionalOres.INSTANCE.configIO.configData_UtilGenWorld));
         mv.addRenderer(new OreMapRenderer());
 
         ItemStack mapStack = new ItemStack(Material.FILLED_MAP, 1);
@@ -66,7 +66,6 @@ public class OreMap implements Listener {
             }
         }
     }
-
 
     public static class Events implements Listener {
 

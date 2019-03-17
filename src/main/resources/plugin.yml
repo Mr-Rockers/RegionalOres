@@ -4,10 +4,28 @@ main: plugin.bharheinn.regionalores.RegionalOres
 api-version: 1.13
 authors: [Bharheinn]
 description: A plugin that encourages players to travel long distances, trade, and utilise economies to obtain resources.
+
+load: STARTUP
+
 commands:
-  regionaloresworld:
-    description: Takes the player to the Regional Ores world.
-    usage: /<command>
   oremap:
     description: Gives you a temporary map of the area of the ores.
-    usage: /<command> (Requires an empty hand.)
+    usage: /<command> (Requires an empty hand or offhand.)
+
+permissions:
+  regionalores.*:
+    description: Gives access to all Regional Ores commands.
+    default: true
+    children:
+      regionalores.oremap: true
+      regionalores.oremap.advanced: true
+
+  regionalores.oremap:
+    description: Allows you to obtain an oremap with /oremap.
+    default: true
+    children:
+      regionalores.oremap.advanced: true
+
+  regionalores.oremap.advanced:
+    description: Allows you to see the map scale and current ore rarity with the oremap.
+    default: true

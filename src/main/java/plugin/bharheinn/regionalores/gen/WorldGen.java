@@ -3,10 +3,7 @@ package plugin.bharheinn.regionalores.gen;
 import javafx.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.util.noise.SimplexOctaveGenerator;
@@ -19,13 +16,12 @@ import java.util.logging.Level;
 
 public class WorldGen implements Listener{
 
-    public World regionalOresWorld;
     private SimplexOctaveGenerator oreRedistributionNoise;
     private ArrayList<Material> sortedOrePool = new ArrayList<>();
     private ArrayList<Pair<Double, Double>> sortedOrePrecedenceBounds = new ArrayList<>();
     private HashMap<Material, String> simpleOreNames = new HashMap<>(); //Populated during createOrePool();
 
-    public void createRegionalOresWorld() {
+    public WorldGen() {
         //Sort ore pool.
         RegionalOres.INSTANCE.getLogger().info("Sorting ore pool...");
         createOrePool();
@@ -45,22 +41,17 @@ public class WorldGen implements Listener{
         RegionalOres.INSTANCE.getLogger().info("Establishing ore precedence bounds...");
         establishOrePrecedenceBounds();
 
-        //Create the actual world.
-        RegionalOres.INSTANCE.getLogger().info("Creating the RegionalOres world.");
+        //Establish ore redist noise values.
         oreRedistributionNoise = new SimplexOctaveGenerator(RegionalOres.INSTANCE.configIO.configData_GenSeed, 1);
         oreRedistributionNoise.setScale(1.0D);
-
-        //Add the OrePopulator through onWorldInit event.
-        RegionalOres.INSTANCE.getServer().getPluginManager().registerEvents(this, RegionalOres.INSTANCE); //Begin listening to events in order to catch oreReplacerEvents.
-        WorldCreator wc = new WorldCreator("world_regionalores").environment(World.Environment.NORMAL); //Establish the criteria for the new world.
-        regionalOresWorld = wc.createWorld(); //Create the world.
-        HandlerList.unregisterAll(this); //Stop listening as we are finished.
     }
 
     @EventHandler
     public void onWorldInit (WorldInitEvent event) {
-        RegionalOres.INSTANCE.getLogger().info("Added the OrePopulator BlockPopulator to " + event.getWorld().getName() + ".");
-        event.getWorld().getPopulators().add(new OrePopulator());
+        if(event.getWorld().getName().equals(RegionalOres.INSTANCE.configIO.configData_UtilGenWorld)) {
+            event.getWorld().getPopulators().add(new OrePopulator());
+            RegionalOres.INSTANCE.getLogger().info("Added the OrePopulator BlockPopulator to \'" + event.getWorld().getName() + "\'.");
+        }
     }
 
     // Used to create a loose of standardization for the generator (that isn't otherwise hardcoded).
@@ -126,6 +117,7 @@ public class WorldGen implements Listener{
         }
         if (totalPrecedence == 0) {
             RegionalOres.INSTANCE.getLogger().log(Level.SEVERE, "TOTAL PRECEDENCE IS ZERO. PLUGIN CANNOT FUNCTION. PLEASE EDIT plugins/RegionalOres/config.yml");
+            RegionalOres.INSTANCE.getLogger().log(Level.SEVERE, "Please visit https://github.com/Mr-Rockers/RegionalOres/wiki/Configuration");
             Bukkit.shutdown();
             return;
         }
@@ -209,5 +201,16 @@ public class WorldGen implements Listener{
             }
         }
         return simpleName;
+    }
+
+    public double getOreMaterialRarity(Material material) {
+        if(!sortedOrePool.isEmpty() && !sortedOrePrecedenceBounds.isEmpty()) {
+            for(int i = 0; i < sortedOrePool.size(); i++) {
+                if(sortedOrePool.get(i) == material) {
+                    return (sortedOrePrecedenceBounds.get(i).getValue() - sortedOrePrecedenceBounds.get(i).getKey()) * 100.0D;
+                }
+            }
+        }
+        return 0.0D;
     }
 }

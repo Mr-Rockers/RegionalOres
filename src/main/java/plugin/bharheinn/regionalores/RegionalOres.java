@@ -1,7 +1,6 @@
 package plugin.bharheinn.regionalores;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,6 +12,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import plugin.bharheinn.regionalores.gen.WorldGen;
 import plugin.bharheinn.regionalores.oremap.OreMap;
 
+import java.util.logging.Level;
+
 public class RegionalOres extends JavaPlugin implements CommandExecutor {
 
     public static RegionalOres INSTANCE;
@@ -23,49 +24,44 @@ public class RegionalOres extends JavaPlugin implements CommandExecutor {
 
     public RegionalOres() {
         INSTANCE = this;
-        worldGen = new WorldGen();
     }
 
     @Override
     public void onEnable() {
         PLUGIN_NAME = getDescription().getName();
         PLUGIN_VERSION = getDescription().getVersion();
-
         configIO = new ConfigIO();
-        worldGen.createRegionalOresWorld();
 
+        if(configIO.configData_UtilStartup) {
+            //The config.yml has not been set correctly so shut server down.
+            getLogger().log(Level.SEVERE, "Util.ShutdownOnStartup in the config.yml is enabled. Please restart the server with the option disabled.");
+            getServer().shutdown();
+        }
+
+        worldGen = new WorldGen();
+
+        getServer().getPluginManager().registerEvents(worldGen, this); //Begin listening to events in order to catch oreReplacerEvents.
         getServer().getPluginManager().registerEvents(new OreMap.Events(), this);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase("regionaloresworld")) {
-            if (worldGen.regionalOresWorld == null) {
-                return false;
-            }
-
-            sender.sendMessage(ChatColor.BLUE + "Zoop!");
-            if (sender instanceof Player) {
-                ((Player) sender).teleport(new Location(worldGen.regionalOresWorld,
-                        worldGen.regionalOresWorld.getSpawnLocation().getX() + 0.5D,
-                        worldGen.regionalOresWorld.getSpawnLocation().getY() + 0.5D,
-                        worldGen.regionalOresWorld.getSpawnLocation().getZ() + 0.5D));
-            }
-        }
-
         if (command.getName().equalsIgnoreCase("oremap")) {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
-                if(player.hasPermission("regionalores.oremap")) {
-                    if (player.getWorld() == worldGen.regionalOresWorld) {
+                if(!configIO.configData_UtilPermissions || player.hasPermission("regionalores.oremap")) {
+                    if (player.getWorld().getName().equals(configIO.configData_UtilGenWorld)){
                         OreMap.FindAndRemoveOreMaps(player);
                         if (IsStackEmpty(player.getInventory().getItemInOffHand())) {
                             new OreMap(player, true);
                         } else if (IsStackEmpty(player.getInventory().getItemInMainHand())) {
                             new OreMap(player, false);
                         }
+                        else {
+                            player.sendMessage(ChatColor.YELLOW + "Empty one of your hands!");
+                        }
                     } else {
-                        player.sendMessage(ChatColor.RED + "This command only works in the Regional Ores world.");
+                        player.sendMessage(ChatColor.RED + "This command only works in the world \'" + configIO.configData_UtilGenWorld + "\'.");
                     }
                 }
                 else {
