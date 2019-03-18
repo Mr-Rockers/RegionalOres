@@ -70,8 +70,6 @@ public class ConfigIO {
         configTable_Gen_OresToReplace.put(Material.GOLD_ORE, 5);
         configTable_Gen_OresToReplace.put(Material.REDSTONE_ORE, 10);
         configTable_Gen_OresToReplace.put(Material.LAPIS_ORE, 3);
-        configTable_Gen_OresToReplace.put(Material.DIAMOND_ORE, 0);
-        configTable_Gen_OresToReplace.put(Material.EMERALD_ORE, 0);
         configTable_Gen_OresToReplace.put(Material.NETHER_QUARTZ_ORE, 2);
 
         /*OREMAP*/

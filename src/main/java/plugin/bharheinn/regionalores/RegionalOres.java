@@ -77,7 +77,9 @@ public class RegionalOres extends JavaPlugin implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "The following ores are removed:");
                 String removedOres = "";
                 for(Material material : configIO.configTable_Gen_OresToRemove.keySet()) {
-                    removedOres += ChatColor.GRAY + material.name() + ChatColor.DARK_RED + ", ";
+                    if(configIO.configTable_Gen_OresToRemove.get(material)) {
+                        removedOres += ChatColor.GRAY + material.name() + ChatColor.DARK_RED + ", ";
+                    }
                 }
                 removedOres = removedOres.substring(0, removedOres.length() - 2);
                 removedOres += ".";
