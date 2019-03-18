@@ -27,7 +27,7 @@ public class WorldGen implements Listener{
         createOrePool();
         String orePoolMessageOutput = "Loaded materials (ores): [";
         for(int i = 0; i < sortedOrePool.size(); i++) {
-            orePoolMessageOutput += (i + 1) + ". - " + simpleOreNames.get(i);
+            orePoolMessageOutput += (i + 1) + ". - " + sortedOrePool.get(i);
             if(i != sortedOrePool.size() - 1) {
                 orePoolMessageOutput += ", ";
             }
