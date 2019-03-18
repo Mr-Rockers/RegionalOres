@@ -11,6 +11,9 @@ commands:
   oremap:
     description: Gives you a temporary map of the area of the ores.
     usage: /<command> (Requires an empty hand or offhand.)
+  oreinfo:
+    description: Shows you which ores are being removed or replaced.
+    usage: /<command>
 
 permissions:
   regionalores.*:
@@ -19,6 +22,7 @@ permissions:
     children:
       regionalores.oremap: true
       regionalores.oremap.advanced: true
+      regionalores.oreinfo: true
 
   regionalores.oremap:
     description: Allows you to obtain an oremap with /oremap.
@@ -28,4 +32,8 @@ permissions:
 
   regionalores.oremap.advanced:
     description: Allows you to see the map scale and current ore rarity with the oremap.
+    default: true
+
+  regionalores.oreinfo:
+    description: Allows you to obtain information about which ores are being removed or replaced.
     default: true

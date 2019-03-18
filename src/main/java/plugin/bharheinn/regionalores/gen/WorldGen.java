@@ -17,9 +17,9 @@ import java.util.logging.Level;
 public class WorldGen implements Listener{
 
     private SimplexOctaveGenerator oreRedistributionNoise;
-    private ArrayList<Material> sortedOrePool = new ArrayList<>();
+    public ArrayList<Material> sortedOrePool = new ArrayList<>();
     private ArrayList<Pair<Double, Double>> sortedOrePrecedenceBounds = new ArrayList<>();
-    private HashMap<Material, String> simpleOreNames = new HashMap<>(); //Populated during createOrePool();
+    private HashMap<Material, String> simpleOreNames = new HashMap<>(); //Populated during createOrePool().
 
     public WorldGen() {
         //Sort ore pool.
@@ -27,7 +27,7 @@ public class WorldGen implements Listener{
         createOrePool();
         String orePoolMessageOutput = "Loaded materials (ores): [";
         for(int i = 0; i < sortedOrePool.size(); i++) {
-            orePoolMessageOutput += (i + 1) + ". - " + sortedOrePool.get(i).name();
+            orePoolMessageOutput += (i + 1) + ". - " + simpleOreNames.get(i);
             if(i != sortedOrePool.size() - 1) {
                 orePoolMessageOutput += ", ";
             }

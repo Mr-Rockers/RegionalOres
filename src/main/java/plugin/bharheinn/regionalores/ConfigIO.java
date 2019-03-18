@@ -43,7 +43,7 @@ public class ConfigIO {
         public HashMap<Material, Integer> configTable_Map_ColorOres = new HashMap<>();
     private static final String CONFIG_MAP_LANG_CURRENTREGION = "Map.Language.CurrentRegion";
         public String configData_Map_LangCurrentRegion;
-    private static final String CONFIG_MAP_LANG_ORENAMES = "Map.Language.OreNames";
+    private static final String CONFIG_MAP_LANG_ORENAMES = "Map.Language.Ores";
         public HashMap<Material, String> configTable_Map_LangOreNames = new HashMap<>();
 
     public ConfigIO() {

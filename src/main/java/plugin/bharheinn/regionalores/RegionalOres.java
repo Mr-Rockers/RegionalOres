@@ -69,6 +69,39 @@ public class RegionalOres extends JavaPlugin implements CommandExecutor {
                 }
             }
         }
+        if (command.getName().equalsIgnoreCase("oreinfo")) {
+            if(!configIO.configData_UtilPermissions || sender.hasPermission("regionalores.oreinfo")) {
+                sender.sendMessage(ChatColor.DARK_PURPLE + "----------------");
+                sender.sendMessage(ChatColor.GRAY + "Showing info for world \"" + ChatColor.AQUA + configIO.configData_UtilGenWorld + ChatColor.GRAY + "\".");
+                sender.sendMessage(ChatColor.DARK_PURPLE + "----------------");
+                sender.sendMessage(ChatColor.RED + "The following ores are removed:");
+                String removedOres = "";
+                for(Material material : configIO.configTable_Gen_OresToRemove.keySet()) {
+                    removedOres += ChatColor.GRAY + material.name() + ChatColor.DARK_RED + ", ";
+                }
+                removedOres = removedOres.substring(0, removedOres.length() - 2);
+                removedOres += ".";
+                sender.sendMessage(removedOres);
+
+                sender.sendMessage(ChatColor.GREEN + "These are replaced with:");
+                String replacedOres = "";
+                for(int i = 0; i < worldGen.sortedOrePool.size(); i++) {
+                    replacedOres += ChatColor.GRAY + worldGen.sortedOrePool.get(i).name();
+                    if(i != worldGen.sortedOrePool.size() - 1) {
+                        replacedOres += ChatColor.DARK_GREEN + ", ";
+                    }
+                    else {
+                        replacedOres += ChatColor.DARK_GREEN + ". ";
+                    }
+                }
+                sender.sendMessage(replacedOres);
+                sender.sendMessage(ChatColor.DARK_PURPLE + "----------------");
+
+            }
+            else {
+                sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+            }
+        }
         return true;
     }
 
